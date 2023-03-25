@@ -6,7 +6,7 @@ import axios from 'axios';
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();

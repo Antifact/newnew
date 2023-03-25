@@ -1,38 +1,35 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom'
+import Avatar from '@mui/material/Avatar'
 
-import UserDetails from '../components/UserDetails';
+function ShowUsers() {
+  const [users, setUsers] = useState([]);
 
-
-const ShowUsers = () => {
-
-
-    // UseState for retrieving and showing posts
-    const [users, setUsers] = useState(null);
-
-    useEffect(() => {
-      // Check to see if there are posts in the database. If the response is ok, then we invoke setPosts and serve it the response in JSON.
-      const getUsers = async () => {
-        const response = await fetch('/');
-        const json = await response.json();
-  
-        if (response.ok) {
-          setUsers(json);
-        }
-      };
-  
-      getUsers();
-    }, []);
+  useEffect(() => {
+    axios.get('/api/users')
+      .then(response => {
+        setUsers(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }, []);
 
   return (
-    <>
-      <div>
-        <h3>Users</h3>
-          {users && users.map((user) => (
-            <UserDetails key={user._id} user={user} />
-          ))};
-      </div>
-    </>
-  )
-};
+    <div>
+      <h1>All Users</h1>
+      <ul>
+        {users.map(user => (
+          <li key={user._id}>
+            <h2><Link to={`/users/${user._id}`}>{user.username}</Link></h2>
+            <p>Email: {user.email}</p>
+            <Avatar src={user.image} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export default ShowUsers;

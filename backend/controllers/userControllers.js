@@ -1,6 +1,6 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
-const genToken = require('../utils/generateToken');
+// const generateToken = require('../utils/generateToken');
 const asyncHandler = require('express-async-handler');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
@@ -14,19 +14,18 @@ const getUsers = async (req, res) => {
 
 // function for getting one user
 const getUser = async (req, res) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({error: 'No user found'})
-  }; 
-
-  let user = await User.findById(id);
-
-  if (!user) {
-    return res.status(404).json({error: 'No user found!'});
-  }
-
-  res.status(200).json(user);
+    const userId = req.params.userId;
+    try {
+      let user = await User.findById(userId);
+      if (!user) {
+        res.status(404).json({ error: `User with ID ${userId} not found` });
+      } else {
+        res.json(user);
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Server error' });
+    }
 };
 
 // the register user function. takes the username, email and password
@@ -36,7 +35,7 @@ const registerUser = async (req, res) => {
   try {
     const { username, email, password, bio, image } = req.body;
 
-    let user = await User.findOne({ email });
+    user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: "Email already exists!" });
     }
@@ -68,7 +67,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ username });
 
   if (user && (await user.matchPassword(password))) {
-    const token = generateToken(user._id);
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     res.json({
       id: user.id,
       username: user.username,

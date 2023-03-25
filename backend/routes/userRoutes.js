@@ -12,13 +12,12 @@ router.route('/register').post(registerUser);
 
 // retrieve / and /users, GET all users from the api
 router.get('/', getUsers);
-router.get('/users', getUsers);
 
 // retrieve /users/:id,  GET one user
-router.get('/users/:id', getUser);
+router.get('/:userId', getUser);
 
 // retrieve /users/me, get current user
-router.get('/users/me', getUser);
+router.get('/me', getUser);
 
 // send a post request to register a user
 router.post('/', registerUser);
