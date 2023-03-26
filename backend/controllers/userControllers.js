@@ -32,7 +32,7 @@ const getUser = async (req, res) => {
 // get the current user
 const getCurrentUser = async (req, res) => {
   try {
-    user = await User.findById(req.user.id).select('-password');
+    let user = await User.findById(req.user.id).select('-password');
     res.json(user);
   } catch (err) {
     console.log(err.message);
@@ -47,7 +47,7 @@ const registerUser = async (req, res) => {
   try {
     const { username, email, password, bio, image } = req.body;
 
-    user = await User.findOne({ email });
+    let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: "Email already exists!" });
     }

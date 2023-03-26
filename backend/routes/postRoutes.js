@@ -1,25 +1,23 @@
-// import express
+
+
 const express = require('express');
-
-// import Post controller 
-const { getPosts, getPost, createPost, deletePost, editPost } = require('../controllers/postControllers');
-
-// import router from express
 const router = express.Router();
+const { createPost, getAllPosts, getPostById, updatePost, deletePost } = require('../controllers/postControllers');
 
-// retrieve / GET all blog posts from the api
-router.get('/', getPosts);
 
-// retrieve / GET individual blog posts
-router.get('/:id', getPost);
-
-// send / POST new blog post
+// Create a new post
 router.post('/', createPost);
 
-// remove / DELETE blog post
+// Update an existing post by ID
+router.put('/:id', updatePost);
+
+// Delete a post by ID
 router.delete('/:id', deletePost);
 
-// edit / UPDATE blog post
-router.patch('/:id', editPost);
+// Get all posts
+router.get('/', getAllPosts);
+
+// Get post by ID
+router.get('/:id', getPostById);
 
 module.exports = router;

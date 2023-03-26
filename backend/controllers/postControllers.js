@@ -1,89 +1,96 @@
-// import Post schema from model
 const Post = require('../models/postModel');
+const User = require('../models/userModel');
+const jwt = require('jsonwebtoken');
 
-// import mongoose
-const mongoose = require('mongoose');
-
-
-// Retrieve all posts in descending order
-const getPosts = async (req, res) => {
-  const posts = await Post.find({}).sort({createdAt: -1});
-
-  res.status(200).json(posts);
-};
-
-// Retrieve an individual post
-const getPost = async (req, res) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({error: 'No post found'})
-  }; 
-
-  const post = await Post.findById(id);
-
-  if (!post) {
-    return res.status(404).json({error: 'No post found!'});
-  }
-
-  res.status(200).json(post);
-};
-
-// Create new post
+// Create a new post
 const createPost = async (req, res) => {
-  const { username, content, image } = req.body;
-  const date = Date.parse(req.body.date);
-
-  // add a post to the database, if any errors then log it
   try {
-    const post = await Post.create({ username, content, image, date });
-    res.status(200).json(post)
+    const accessToken = req.headers.authorization.split(' ')[1];
+    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+    const userId = decoded.sub;
+
+    console.log(decoded.sub);
+
+    let image = null;
+    if (req.file) {
+      image = req.file.path;
+    }
+
+    const user = await User.findById(userId).select('-password');
+
+    const post = await Post.create({
+      userId,
+      username: user.username,
+      content: req.body,
+      image
+    });
+
+    return res.status(201).json({ post });
   } catch (error) {
-    res.status(400).json({error: error.message});
-  };
-};
-
-// delete post
-const deletePost = async (req, res) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({error: 'No post found!'});
-  };
-
-  const post = await Post.findOneAndDelete({_id: id});
-
-  if (!post) {
-    return res.status(400).json({error: 'No post found'});
+    console.error(error);
+    return res.status(500).json({ message: 'Server error!' });
   }
-
-  res.status(200).json(post);
-};
-
-// edit post
-const editPost = async (req, res) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({error: 'No post found'});
-  };
-
-  const post = await Post.findOneAndUpdate({_id: id}, {
-    ...req.body
-  });
-
-  if (!post) {
-    return res.status(400).json({error: 'No post found'});
-  };
-
-  res.status(200).json(post);
 };
 
 
-module.exports = {
-  createPost,
-  getPosts,
-  getPost,
-  deletePost,
-  editPost
+
+// Get all posts
+const getAllPosts = async (req, res) => {
+  try {
+    const posts = await Post.find().sort({ createdAt: -1 });
+    return res.status(200).json({ posts });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
 };
+
+// Get a post by id
+const getPostById = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    return res.status(200).json({ post });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Update a post by id
+const updatePost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    const { username, content, image } = req.body;
+    post.username = username || post.username;
+    post.content = content || post.content;
+    post.image = image || post.image;
+    await post.save();
+    return res.status(200).json({ post });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Delete a post by id
+const deletePost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    await post.delete();
+    return res.status(200).json({ message: 'Post deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { createPost, getAllPosts, getPostById, updatePost, deletePost };
