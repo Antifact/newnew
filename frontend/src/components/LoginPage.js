@@ -6,15 +6,15 @@ import axios from 'axios';
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [setError] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('api/users/login', { username, password });
+      const response = await axios.post('http://localhost:5001/api/users/login', { username, password });
       localStorage.setItem('accessToken', response.data.token);
       // Redirect to user profile page
-      window.location = `/users/${response.data.id}`;
+      window.location = `/home`;
     } catch (err) {
       setError(err.response.data.message);
     }

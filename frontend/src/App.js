@@ -6,6 +6,7 @@ import RegisterPage from './components/RegisterPage';
 import LoginPage from './components/LoginPage';
 import ShowUsers from './pages/ShowUsers';
 import Profile from './pages/Profile';
+import CurrentProfile from './pages/currentProfile';
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
         <Route path='/login' element={ <LoginPage /> } />
         <Route path='/users' element={ <ShowUsers /> } />
         <Route path='/users/:id' element={ <Profile /> } />
-        {/* <Route path='/users/me' element={ <Profile /> } /> */}
+        <Route path='/users/me' element={ <CurrentProfile /> } />
       </Routes>
     </Router>
   );
