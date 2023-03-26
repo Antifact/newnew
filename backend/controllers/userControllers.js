@@ -1,6 +1,6 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
-// const generateToken = require('../utils/generateToken');
+const generateToken = require('../utils/generateToken');
 const asyncHandler = require('express-async-handler');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
@@ -28,6 +28,18 @@ const getUser = async (req, res) => {
     }
 };
 
+
+// get the current user
+const getCurrentUser = async (req, res) => {
+  try {
+    user = await User.findById(req.user.id).select('-password');
+    res.json(user);
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
 // the register user function. takes the username, email and password
 // checks to see if the user exists, and if so, throws an error.
 // posts the user to the database using json.
@@ -52,7 +64,7 @@ const registerUser = async (req, res) => {
     await newUser.save();
 
     
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+    let token = generateToken(newUser._id);
     res.status(200).json({ message: 'User successfully signed up!', token });
 
   } catch (err) {
@@ -67,13 +79,15 @@ const loginUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ username });
 
   if (user && (await user.matchPassword(password))) {
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    token = generateToken(user._id);
     res.json({
       id: user.id,
       username: user.username,
       email: user.email,
       token
     });
+
+    console.log(token);
 
     res.status(200).json({ message: 'User successfully logged in!', token });
   } else {
@@ -82,4 +96,4 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { getUsers, getUser, registerUser, loginUser };
+module.exports = { getUsers, getUser, getCurrentUser, registerUser, loginUser };
