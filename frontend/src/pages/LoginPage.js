@@ -11,7 +11,7 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5001/api/users/login', { username, password });
+      const response = await axios.post('/api/users/login', { username, password });
       localStorage.setItem('accessToken', response.data.token);
       // Redirect to user profile page
       window.location = `/home`;

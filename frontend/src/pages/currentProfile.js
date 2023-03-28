@@ -9,7 +9,7 @@ const CurrentProfile = () => {
         console.log('Access token:', accessToken);
         if (accessToken) {
         axios
-            .get('http://localhost:5001/api/users/me', {
+            .get('/api/users/me', {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },

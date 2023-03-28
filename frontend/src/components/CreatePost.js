@@ -4,19 +4,17 @@ import axios from 'axios';
 
 const CreatePost = () => {
   const [content, setContent] = useState('');
-  const [image, setImage] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const accessToken = localStorage.getItem('accessToken');
 
     const post = {
-      content,
-      image
+      content
     };
 
     try {
-      const response = await axios.post('http://localhost:5001/api/posts', post, {
+      const response = await axios.post('/api/posts', post, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -24,7 +22,6 @@ const CreatePost = () => {
 
       console.log(response.data);
       setContent('');
-      setImage(null);
     } catch (error) {
       console.log(error);
     }
@@ -36,15 +33,12 @@ const CreatePost = () => {
         <Form.Control
           as="textarea"
           name="content"
+          type="text"
           rows={3}
           placeholder="What's on your mind?"
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
-      </Form.Group>
-
-      <Form.Group controlId="image">
-        <Form.Control type="file" onChange={(e) => setImage(e.target.files[0])} />
       </Form.Group>
 
       <Button variant="primary" type="submit">

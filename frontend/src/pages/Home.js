@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import NavBar from '../components/common/NavBar';
 import axios from 'axios';
 import CreatePost from '../components/CreatePost';
+import PostFeed from '../components/PostFeed';
 
 const Home = () => {
 
@@ -10,7 +11,7 @@ const Home = () => {
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     if (accessToken) {
-      axios.get('http://localhost:5001/api/users/me', {
+      axios.get('/api/users/me', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -31,12 +32,14 @@ const Home = () => {
     <>
       <NavBar />
       <h1>Hello</h1>
-
+      
       { currentUser ? 
         <CreatePost />
         :
         null
       }
+
+      <PostFeed />
     </>
   )
 }

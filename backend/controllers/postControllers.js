@@ -9,20 +9,14 @@ const createPost = async (req, res) => {
     const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
     const userId = decoded.sub;
 
-    console.log(decoded.sub);
-
-    let image = null;
-    if (req.file) {
-      image = req.file.path;
-    }
+    // console.log(decoded.sub);
 
     const user = await User.findById(userId).select('-password');
 
     const post = await Post.create({
       userId,
       username: user.username,
-      content: req.body,
-      image
+      content: req.body.content
     });
 
     return res.status(201).json({ post });

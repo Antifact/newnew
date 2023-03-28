@@ -14,7 +14,7 @@ const NavBar = () => {
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     if (accessToken) {
-      axios.get('http://localhost:5001/api/users/me', {
+      axios.get('/api/users/me', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
